@@ -11,19 +11,26 @@ enum OrderType {
 
 contract SimpleIndex is BaseIndex {
     /* ====================================================================== */
+    /*                               ERRORS
+    /* ====================================================================== */
+
+    error ThresholdAboveOne();
+
+    /* ====================================================================== */
     /*                               STATE
     /* ====================================================================== */
 
     uint256 public constant override BASE_GAS = 35e3;
-    IERC20 public WETH;
+    uint256 public rebalanceThreshold; // 1e18 == 1%
+
+    constructor(address admin, address registry, uint256 threshold) BaseAction(admin, registry) {
+        if (threshold >= FixedPoint.ONE) revert ThresholdAboveOne();
+        rebalanceThreshold = threshold;
+    }
 
     /* ====================================================================== */
     /*                               ACTION FUNCTIONS
     /* ====================================================================== */
-
-    constructor(address weth, address admin, address registry) BaseAction(admin, registry) {
-        WETH = IERC20(weth);
-    }
 
     function call() external auth {
         (isRelayer[msg.sender] ? _relayedCall : _call)();
@@ -34,7 +41,7 @@ contract SimpleIndex is BaseIndex {
     }
 
     function _call() internal {
-        _valdateRebalalance();
+        _valdateRebalalance(rebalanceThreshold);
 
         uint256 len = assets.length;
         uint256[] memory targetBalances = getTargetBalances();
@@ -59,32 +66,6 @@ contract SimpleIndex is BaseIndex {
     }
 
     /* ====================================================================== */
-    /*                               VIEW FUNCTIONS
-    /* ====================================================================== */
-
-    function getTargetBalances() public view returns (uint256[] memory) {
-        uint256 len = assets.length;
-        uint256[] memory balances = new uint256[](len);
-        uint256[] memory prices = new uint256[](len);
-        uint256[] memory targetBalances = new uint256[](len);
-        uint256 totalPortfolioValue = 0;
-
-        // Get the balances and prices of the assets
-        for (uint256 i = 0; i < len; i++) {
-            balances[i] = IERC20(assets[i]).balanceOf(address(smartVault));
-            prices[i] = smartVault.getPrice(assets[i], address(WETH));
-            totalPortfolioValue += (balances[i] * prices[i]);
-        }
-
-        // Calculate the target balance for each element
-        for (uint256 i = 0; i < len; i++) {
-            targetBalances[i] = (totalPortfolioValue * weights[i]) / (prices[i] * 100);
-        }
-
-        return targetBalances;
-    }
-
-    /* ====================================================================== */
     /*                               INTERNAL FUNCTIONS
     /* ====================================================================== */
 
@@ -92,7 +73,7 @@ contract SimpleIndex is BaseIndex {
         order == OrderType.Buy
             ? smartVault.swap(
                 0, // use uniswap v2
-                address(WETH),
+                smartVault.wrappedNativeToken(),
                 token,
                 amount,
                 ISmartVault.SwapLimit.Slippage,
@@ -102,7 +83,7 @@ contract SimpleIndex is BaseIndex {
             : smartVault.swap(
                 0, // use uniswap v2
                 token,
-                address(WETH),
+                smartVault.wrappedNativeToken(),
                 amount,
                 ISmartVault.SwapLimit.Slippage,
                 maxSlippage,

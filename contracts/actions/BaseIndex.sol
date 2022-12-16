@@ -34,6 +34,32 @@ abstract contract BaseIndex is BaseAction, RelayedAction {
     uint256 public maxSlippage;
 
     /* ====================================================================== */
+    /*                               VIEW FUNCTIONS
+    /* ====================================================================== */
+
+    function getTargetBalances() public view returns (uint256[] memory) {
+        uint256 len = assets.length;
+        uint256[] memory balances = new uint256[](len);
+        uint256[] memory prices = new uint256[](len);
+        uint256[] memory targetBalances = new uint256[](len);
+        uint256 totalPortfolioValue = 0;
+
+        // Get the balances and prices of the assets
+        for (uint256 i = 0; i < len; i++) {
+            balances[i] = IERC20(assets[i]).balanceOf(address(smartVault));
+            prices[i] = smartVault.getPrice(assets[i], smartVault.wrappedNativeToken());
+            totalPortfolioValue += (balances[i] * prices[i]);
+        }
+
+        // Calculate the target balance for each element
+        for (uint256 i = 0; i < len; i++) {
+            targetBalances[i] = (totalPortfolioValue * weights[i]) / (prices[i] * 100);
+        }
+
+        return targetBalances;
+    }
+
+    /* ====================================================================== */
     /*                          GOVERNANCE FUNCTIONS
     /* ====================================================================== */
 
@@ -48,7 +74,7 @@ abstract contract BaseIndex is BaseAction, RelayedAction {
         for (uint256 i = 0; i < _weights.length; i++) {
             totalWeights += _weights[i];
         }
-        if (totalWeights != 1) revert WeightsNotOneHundredPercent();
+        if (totalWeights != 1e18) revert WeightsNotOneHundredPercent();
         if (_assets.length != _weights.length) revert AssetWeightsMissmatch();
 
         assets = _assets;
@@ -61,8 +87,30 @@ abstract contract BaseIndex is BaseAction, RelayedAction {
     /*                           VALIDATION FUNCTIONS
     /* ====================================================================== */
 
-    // TODO: guards around when its ok for bots to rebalance
-    function _valdateRebalalance() internal pure returns (bool) {
-        return true;
+    function _valdateRebalalance(uint256 _percentage) internal view returns (bool) {
+        uint256[] memory targetBalances = getTargetBalances();
+        uint256 len = assets.length;
+        uint256[] memory balances = new uint256[](len);
+
+        // Get the balances of the assets
+        for (uint256 i = 0; i < len; i++) {
+            balances[i] = IERC20(assets[i]).balanceOf(address(smartVault));
+        }
+
+        // Check if the actual balance of any of the assets is deviated by more than the percentage
+        for (uint256 i = 0; i < len; i++) {
+            // Calculate the acceptable range for the current asset
+            uint256 minBalance = targetBalances[i] * (FixedPoint.ONE - _percentage);
+            uint256 maxBalance = targetBalances[i] * (FixedPoint.ONE + _percentage);
+
+            // Check if the actual balance is outside the acceptable range
+            if (balances[i] < minBalance || balances[i] > maxBalance) {
+                // Rebalance is allowed if the actual balance is outside the acceptable range
+                return true;
+            }
+        }
+
+        // Otherwise, rebalance is not allowed
+        return false;
     }
 }
