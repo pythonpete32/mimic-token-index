@@ -515,6 +515,19 @@
     ethers "^5.0.8"
     hardhat "^2.4.1"
 
+"@mimic-fi/v2-helpers@^0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@mimic-fi/v2-helpers/-/v2-helpers-0.0.12.tgz#f9b1fd940701177b850b7c68e4953914043310b0"
+  integrity sha512-9cd4kwOCxW5ESPgpHnMX/eHCRdDKhZHiZu0lRsEbNUG8GheSnNUwCtbt/pqC7tNA4yYtGyFTTrhk7SqSQ+hk9A==
+  dependencies:
+    "@nomiclabs/hardhat-ethers" "^2.2.1"
+    "@nomiclabs/hardhat-waffle" "^2.0.3"
+    "@types/chai" "^4.2.18"
+    "@types/mocha" "^8.2.2"
+    chai "^4.2.0"
+    decimal.js "^10.3.1"
+    hardhat "^2.12.3"
+
 "@mimic-fi/v2-price-oracle@0.0.7":
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/@mimic-fi/v2-price-oracle/-/v2-price-oracle-0.0.7.tgz#1f79a75e83caba115750793f8a212c3798c17265"
@@ -823,12 +836,12 @@
     "@nomicfoundation/solidity-analyzer-win32-ia32-msvc" "0.1.0"
     "@nomicfoundation/solidity-analyzer-win32-x64-msvc" "0.1.0"
 
-"@nomiclabs/hardhat-ethers@^2.0.2":
+"@nomiclabs/hardhat-ethers@^2.0.2", "@nomiclabs/hardhat-ethers@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@nomiclabs/hardhat-ethers/-/hardhat-ethers-2.2.1.tgz#8057b43566a0e41abeb8142064a3c0d3f23dca86"
   integrity sha512-RHWYwnxryWR8hzRmU4Jm/q4gzvXpetUOJ4OPlwH2YARcDB+j79+yAYCwO0lN1SUOb4++oOTJEe6AWLEc42LIvg==
 
-"@nomiclabs/hardhat-waffle@^2.0.1":
+"@nomiclabs/hardhat-waffle@^2.0.1", "@nomiclabs/hardhat-waffle@^2.0.3":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@nomiclabs/hardhat-waffle/-/hardhat-waffle-2.0.3.tgz#9c538a09c5ed89f68f5fd2dc3f78f16ed1d6e0b1"
   integrity sha512-049PHSnI1CZq6+XTbrMbMv5NaL7cednTfPenx02k3cEh8wBMLa6ys++dBETJa6JjfwgA9nBhhHQ173LJv6k2Pg==
@@ -4995,6 +5008,62 @@ hardhat-local-networks-config-plugin@^0.0.6:
   integrity sha512-Ala+n7+KtAKXakDAyR4GhgTvgalnP2OK8mte9cqvV47AJIQWCdtBAKeGdAdUvsGyvGVTW1f6mYK2PJQyEmOE5w==
   dependencies:
     deepmerge "^4.2.2"
+
+hardhat@^2.12.3:
+  version "2.12.4"
+  resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.12.4.tgz#e539ba58bee9ba1a1ced823bfdcec0b3c5a3e70f"
+  integrity sha512-rc9S2U/4M+77LxW1Kg7oqMMmjl81tzn5rNFARhbXKUA1am/nhfMJEujOjuKvt+ZGMiZ11PYSe8gyIpB/aRNDgw==
+  dependencies:
+    "@ethersproject/abi" "^5.1.2"
+    "@metamask/eth-sig-util" "^4.0.0"
+    "@nomicfoundation/ethereumjs-block" "^4.0.0"
+    "@nomicfoundation/ethereumjs-blockchain" "^6.0.0"
+    "@nomicfoundation/ethereumjs-common" "^3.0.0"
+    "@nomicfoundation/ethereumjs-evm" "^1.0.0"
+    "@nomicfoundation/ethereumjs-rlp" "^4.0.0"
+    "@nomicfoundation/ethereumjs-statemanager" "^1.0.0"
+    "@nomicfoundation/ethereumjs-trie" "^5.0.0"
+    "@nomicfoundation/ethereumjs-tx" "^4.0.0"
+    "@nomicfoundation/ethereumjs-util" "^8.0.0"
+    "@nomicfoundation/ethereumjs-vm" "^6.0.0"
+    "@nomicfoundation/solidity-analyzer" "^0.1.0"
+    "@sentry/node" "^5.18.1"
+    "@types/bn.js" "^5.1.0"
+    "@types/lru-cache" "^5.1.0"
+    abort-controller "^3.0.0"
+    adm-zip "^0.4.16"
+    aggregate-error "^3.0.0"
+    ansi-escapes "^4.3.0"
+    chalk "^2.4.2"
+    chokidar "^3.4.0"
+    ci-info "^2.0.0"
+    debug "^4.1.1"
+    enquirer "^2.3.0"
+    env-paths "^2.2.0"
+    ethereum-cryptography "^1.0.3"
+    ethereumjs-abi "^0.6.8"
+    find-up "^2.1.0"
+    fp-ts "1.19.3"
+    fs-extra "^7.0.1"
+    glob "7.2.0"
+    immutable "^4.0.0-rc.12"
+    io-ts "1.10.4"
+    keccak "^3.0.2"
+    lodash "^4.17.11"
+    mnemonist "^0.38.0"
+    mocha "^10.0.0"
+    p-map "^4.0.0"
+    qs "^6.7.0"
+    raw-body "^2.4.1"
+    resolve "1.17.0"
+    semver "^6.3.0"
+    solc "0.7.3"
+    source-map-support "^0.5.13"
+    stacktrace-parser "^0.1.10"
+    tsort "0.0.1"
+    undici "^5.4.0"
+    uuid "^8.3.2"
+    ws "^7.4.6"
 
 hardhat@^2.4.1:
   version "2.12.3"
