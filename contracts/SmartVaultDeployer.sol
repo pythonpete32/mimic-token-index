@@ -20,6 +20,9 @@ contract SmartVaultDeployer {
         address impl;
         address admin;
         address[] managers;
+        address[] tokens;
+        uint256[] weights;
+        uint256 maxSlippage;
         Deployer.RelayedActionParams relayedActionParams;
     }
 
@@ -34,6 +37,22 @@ contract SmartVaultDeployer {
         SimpleIndex index = SimpleIndex(params.impl);
         Deployer.setupBaseAction(index, params.admin, address(smartVault));
         address[] memory executors = Arrays.from(params.admin, params.managers, params.relayedActionParams.relayers);
+
+        // authorise owner permissions
+        index.authorize(address(params.admin), index.call.selector);
+
+        // set max slippage
+        index.authorize(address(params.admin), index.setMaxSlippage.selector);
+        index.authorize(address(this), index.setMaxSlippage.selector);
+        index.setMaxSlippage(params.maxSlippage);
+        index.unauthorize(address(this), index.call.selector);
+
+        // setup portfolio
+        index.authorize(address(params.admin), index.setPortfolio.selector);
+        index.authorize(address(this), index.setPortfolio.selector);
+        index.setPortfolio(params.tokens, params.weights);
+        index.unauthorize(address(this), index.setPortfolio.selector);
+
         Deployer.setupActionExecutors(index, executors, index.call.selector);
         Deployer.setupRelayedAction(index, params.admin, params.relayedActionParams);
         Deployer.transferAdminPermissions(index, params.admin);
